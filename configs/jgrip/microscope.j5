@@ -1,0 +1,131 @@
+/*
+For Travis
+Olympus BH2-UMA measuring microscope
+UT100 NEMA23 stages
+*/
+{
+    "planner": {
+        //FIXME: not tuned
+        "tsettle_motion": 0.2,
+        "tsettle_hdr": 0.1,
+    },
+    /*
+    2mm / rev
+    200 step / rev motors?
+    estimate 400
+    nope...actually needs to be 1600...hmm interesting
+    */
+    "motion": {
+        "hal": "grbl-ser",
+        "grbl": {
+            "rc": [
+                //$0 – Step pulse, microseconds
+                //"$0=10",
+                //$1 - Step idle delay, milliseconds
+                //$1=25
+                //$3 – Direction port invert, mask
+                //"$3=3",
+                //Use future units
+                //"$13=0",
+                //Disable soft limits (want negative, no homing workflow)
+                //"$20=0",
+                //Disable hard limits (no switch)
+                //"$21=0",
+                //Disable homing
+                //"$22=0",
+                //$100, $101 and $102 – [X,Y,Z] steps/mm
+                //"$100=1600.000", "$101=1600.000",
+                //X - Max Rate (mm/min)
+                //Target around 125 mm / min absolute speed (ie after soft scalars)
+                //"$110=125.000", "$111=125.000", "$112=125.000",
+                //$120, $121, $122 – [X,Y,Z] Acceleration, mm/sec^2
+                //Target max vel / 20
+                //"$120=6.25", "$121=6.25", "$122=6.25",
+                //$130, $131, $132 – [X,Y,Z] Max travel, mm
+                //Set slightly above pyuscope limit
+                //homg disabled => not usable
+                //"$130=19.500",
+                //"$131=19.500",
+
+                //Select G54 coordinate system
+                "G54",
+                //G54: zero out offsets
+                //Could use P0 but better to make state canonical
+                "G10 L2 P1 X0 Y0 Z0",
+            ],
+        },
+        //XXX: actual value?
+        "backlash": 0.05,
+        /*
+        Actual stage range: 25 mm
+        Leave 2.5 mm each side
+        */
+        "soft_limits": {
+            "xmin": -2.5,
+            "xmax": 80.5,
+            "ymin": -2.5,
+            "ymax": 80.5,
+        },
+    },
+    //E3ISPM20000KPA
+    "imager": {
+        "source":"gst-toupcamsrc",
+        "width": 5440,
+        "height": 3648,
+        "source_properties": {
+            "esize": 0
+        },
+        "scalar": 0.50,
+        "source_properties_mod": {
+            //In us. Can go up to 15 sec which is impractical for typical usage
+            "expotime": {
+                "max": 200000
+            },
+        },
+    },
+    "objectives": [
+        //OBJ-107
+        {
+            "name":"MSPlan 5X",
+            "magnification": 5,
+            "na": 0.10,
+            "suffix": "ms5x",
+            "x_view": 2.3,
+        },
+        //OBJ-108
+        {
+            "name":"MSPlan 10X",
+            "magnification": 10,
+            "na": 0.25,
+            "suffix": "ms10x",
+            "x_view": 1.2,
+        },
+        //OBJ-103
+        {
+            "name":"MSPlan 20X",
+            "magnification": 20,
+            "na": 0.46,
+            "suffix": "ms20x",
+            "x_view": 0.6,
+        },
+        //OBJ-112
+        {
+            "name":"MSPlan 50X",
+            "magnification": 50,
+            "na": 0.75,
+            "suffix": "ms50x",
+            "x_view": 0.44,
+        },
+        //OBJ-113
+        {
+            "name":"MSPlan 100X",
+            "magnification": 100,
+            "na": 0.90,
+            "suffix": "ms100x",
+            "x_view": 0.22,
+            //FIXME: not tuned
+            "tsettle_motion": 1.0,
+        }
+    ]
+}
+
